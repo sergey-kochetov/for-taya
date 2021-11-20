@@ -4,20 +4,20 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
-@ToString
 @RequiredArgsConstructor
 @Entity(name = "products")
 @AllArgsConstructor
+@Transactional(propagation = Propagation.MANDATORY)
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -29,4 +29,27 @@ public class Product {
     private int price;
     private String city;
     private String author;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private List<Image> images = new ArrayList<>();
+
+    @Column(name = "preview_image_id")
+    private Long previewImageId;
+
+    @Column(name = "date_of_created", nullable = false)
+    private Instant dateOfCreated;
+
+    @PrePersist
+    public void init() {
+        dateOfCreated = Instant.now();
+    }
+
+    public Product addImage(Image image) {
+        image.setProduct(this);
+        if (image.isPreviewImage()) {
+            this.previewImageId = image.getId();
+        }
+        images.add(image);
+        return this;
+    }
 }
