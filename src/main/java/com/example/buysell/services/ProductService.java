@@ -1,36 +1,43 @@
 package com.example.buysell.services;
 
 import com.example.buysell.models.Product;
+import com.example.buysell.repositories.ProductRepository;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
+@Slf4j
+@AllArgsConstructor
 public class ProductService {
-    private List<Product> products = new ArrayList<>();
-    private long ID = 0;
+    private final ProductRepository productRepository;
 
-    {
-        products.add(new Product(++ID, "PlayStation 5", "Simple description", 67000, "Krasnoyarsk", "tomas"));
-        products.add(new Product(++ID, "Iphone 8", "Simple description", 24000, "Moscow", "artmcoder"));
-    }
+    @PersistenceContext
+    private EntityManager em;
 
-    public List<Product> listProducts() { return products; }
 
     public void saveProduct(Product product) {
-        product.setId(++ID);
-        products.add(product);
+        em.persist(product);
     }
 
     public void deleteProduct(Long id) {
-        products.removeIf(product -> product.getId().equals(id));
+        Optional<Product> product = productRepository.findById(id);
+        if (product.isPresent()) {
+            em.remove(product);
+        }
+    }
+
+    public List<Product> getProductByTitle(String title) {
+        return title == null || title.isEmpty() ? productRepository.findAll() : productRepository.findByTitle(title);
     }
 
     public Product getProductById(Long id) {
-        for (Product product : products) {
-            if (product.getId().equals(id)) return product;
-        }
-        return null;
+        return productRepository.findById(id).orElse(null);
     }
 }
