@@ -12,6 +12,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Table(name = "users")
@@ -53,6 +54,9 @@ public class User implements UserDetails {
 
     @Column(name = "date_of_create", nullable = false)
     private LocalDateTime dateOfCreate;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Product> products;
 
     @PrePersist
     public void prePersist() {

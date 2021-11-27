@@ -2,8 +2,10 @@ package com.example.buysell.services;
 
 import com.example.buysell.models.Image;
 import com.example.buysell.models.Product;
+import com.example.buysell.models.User;
 import com.example.buysell.repositories.ImageRepository;
 import com.example.buysell.repositories.ProductRepository;
+import com.example.buysell.repositories.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -12,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.io.IOException;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +24,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
+    private final UserRepository userRepository;
     private final ImageService imageService;
     private final ImageRepository imageRepository;
 
@@ -28,7 +32,11 @@ public class ProductService {
     private EntityManager em;
 
 
-    public void saveProduct(Product product, MultipartFile file1, MultipartFile file2, MultipartFile file3) throws IOException {
+    public void saveProduct(Principal principal, Product product,
+            MultipartFile file1, MultipartFile file2, MultipartFile file3) throws IOException {
+        User currentUser = getCurrentUser(principal);
+        product.setUser(currentUser);
+
         Image image1;
         Image image2;
         Image image3;
@@ -47,6 +55,16 @@ public class ProductService {
             product.addImage(imageRepository.save(image3));
         }
         em.persist(product);
+    }
+
+    public User getCurrentUser(Principal principal) {
+        if (principal == null) {
+            User user = new User();
+            user.setName("n/a");
+            return user;
+        }
+        String email = principal.getName();
+        return userRepository.findByEmail(email);
     }
 
     public void deleteProduct(Long id) {

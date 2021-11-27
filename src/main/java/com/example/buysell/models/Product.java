@@ -39,6 +39,10 @@ public class Product {
     @Column(name = "date_of_created", nullable = false)
     private Instant dateOfCreated;
 
+    @ManyToOne(cascade = {CascadeType.ALL})
+    @JoinColumn(name = "user_id")
+    private User user;
+
     @PrePersist
     public void init() {
         dateOfCreated = Instant.now();
