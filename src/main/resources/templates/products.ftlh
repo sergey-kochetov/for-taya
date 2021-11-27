@@ -4,18 +4,18 @@
     <title>BUYSELL</title>
 </head>
 <body>
-<h1>BUYSELL</h1><hr>
+<h1>BUYSELL | <a href="/login">Войти</a></h1><hr>
 <h4>Товары со всей России</h4>
 <form action="/" method="get">
-    by title: <input type="text" name="title"><br>
-    <input type="submit" value="find">
+    Поиск по названию объявления: <input type="text" name="title"><br>
+    <input type="submit" value="Поиск"/>
 </form>
 <#list products as product>
-    <div>
-        <p><b>${product.title}</b> ${product.price} руб. | <a href="/product/${product.id}">Подробнее...</a></p>
-    </div>
-    <#else>
-        <h3>not found</h3>
+<div>
+    <p><b>${product.title}</b> ${product.price} руб. | <a href="/product/${product.id}">Подробнее...</a></p>
+</div>
+<#else>
+<h3>Товаров нет</h3>
 </#list>
 <hr>
 <h3>Создать новый товар</h3>
@@ -25,9 +25,10 @@
     Цена: <input type="number" name="price"/><br><br>
     Город: <input type="text" name="city"/><br><br>
     Имя: <input type="text" name="author"/><br><br>
-    foto1 : <input type="file" name="file1"/><br><br>
-    foto2 : <input type="file" name="file2"/><br><br>
-    foto3 : <input type="file" name="file3"/><br><br>
+    Первая фотография: <input type="file" name="file1"/><br><br>
+    Вторая фотография: <input type="file" name="file2"/><br><br>
+    Третья фотография: <input type="file" name="file3"/><br><br>
+    <input type="hidden" name="_csrf" value="${_csrf.token}">
     <input type="submit" value="Добавить товар"/>
 </form>
 </body>
